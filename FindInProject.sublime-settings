@@ -1,0 +1,59 @@
+{
+  // Encodings to try (in the order to try them). If we fail to open a file
+  // using e.g. UTF-8 we try again with Windows-1252. Defaults to UTF-8 only.
+  "find_in_project_encodings": ["utf-8", "windows-1252", "windows-1251", "windows-1250"],
+
+  // Skip binary files (files that contains a NULL byte). Note that UTF-16 files
+  // might be identified as binary. Defaults to true.
+  "find_in_project_skip_binary_files": true,
+
+  // Directories to ignore. While traversing the project the search does not
+  // descend into any directory with the specified name(s). Defaults to none.
+  "find_in_project_ignore_dirs": [".git", "tmp"],
+
+  // File extensions to ignore. While traversing the project the search skips
+  // all files that ends with the specified extensions. Defaults to none.
+  "find_in_project_ignore_extensions": [
+    // Document extensions
+    "pdf", "xls", "xlsx", "doc", "docx", "ppt", "pptx", "epub",
+
+    // Archieve extensions
+    "zip", "rar", "7z", "deb", "pkg", "rpm", "gz", "z",
+
+    // Audio extensions
+    "mp3", "wma", "wav",
+
+    // Image extensions
+    "png", "jpeg", "jpg", "ico", "bmp", "svg", "gif",
+
+    // Video extensions
+    "avi", "mp4", "mpeg", "mpg", "wmv", "mov", "mkv", "flv",
+
+    // Misc extensions
+    "o", "out", "dll", "so", "bin", "iso", "exe", "db", "img"
+  ],
+
+  // Maximum file size. While traversing the project the search skips all files
+  // that are larger than the specified size. Defaults to 20 MB.
+  "find_in_project_max_file_size_mb": 20,
+
+  // Follow symbolic links while traversing project. Defaults to false.
+  "find_in_project_follow_sym_links": false,
+
+  // Maximum line length in result view excluding the target string. This is
+  // nice to have when searching in e.g. minified JS files. Defaults to 100
+  // (show a maximum of 50 chars on either sides of the target string).
+  "find_in_project_max_line_len": 100,
+
+  // Show warning in search results when a file could not be opened. This
+  // typically happens when missing an encoding. Defaults to false.
+  "find_in_project_show_warning_on_open_failure": false,
+
+  // Show warning in search results when skipping a file due to size. Defaults
+  // to false.
+  "find_in_project_show_warning_on_size_skip": false,
+
+  // Cancel search when exceeding this amount of hits. Set to 0 to disable.
+  // Defaults to 5000.
+  "find_in_project_excessive_hits_count": 5000,
+}
