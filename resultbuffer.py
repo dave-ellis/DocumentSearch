@@ -37,7 +37,8 @@ class ResultBuffer:
       Insert results for a file into the buffer.
       """
       # Add file name to start of result block
-      result_str = ("\n" + result["filepath"] + "\n")
+      no_results = str(len(result["result"]))
+      result_str = ("\n" + result["filepath"] + " (" + no_results + ")\n")
 
       # For each result in file add an indented line
       for line in result["result"].keys():
@@ -104,6 +105,16 @@ class FindInProjectCommand:
       if "findinproject.filename" in scope:
          return True
       return False
+
+   def get_filename_from_point(self, point):
+      if self.point_is_file(point) == False:
+         return ""
+
+      fileline = self.view.line(point)
+      filenameraw = self.view.substr(fileline)
+      filenameend = filenameraw.rfind('(')
+      return filenameraw[:filenameend]
+
 
    def point_is_empty_line(self, point):
       """
@@ -211,8 +222,7 @@ class FindInProjectOpenResult(FindInProjectCommand, sublime_plugin.TextCommand):
       # If cursor is standing on a filename line
       point = self.view.text_point(row, 0)
       if self.point_is_file(point):
-         fileline = self.view.line(point)
-         filename = self.view.substr(fileline)
+         filename = self.get_filename_from_point(point)
          win.open_file(filename)
          return
 
@@ -226,7 +236,7 @@ class FindInProjectOpenResult(FindInProjectCommand, sublime_plugin.TextCommand):
       if row is 0:
          return
 
-      filename = self.view.substr(self.view.line(filepoint))
+      filename = self.get_filename_from_point(filepoint)
       linecontent = self.view.substr(self.view.line(point))
       lineNo = linecontent.split(':')[0]
       lineNo = lineNo.strip()
