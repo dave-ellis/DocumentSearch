@@ -8,8 +8,6 @@ import sublime
 from . import filesearcher
 from . import resultbuffer
 
-# cleanup this file and result buffer
-# test on other platforms (linux, osx)
 
 class FindInProject(sublime_plugin.TextCommand):
    """
@@ -100,7 +98,7 @@ class FindInProject(sublime_plugin.TextCommand):
 
          # Check if result buffer has been closed - in this case we cancel the
          # search.
-         if self.search_cancelled == False and self.result_buffer.is_closed():
+         if (self.search_cancelled == False) and (self.result_buffer.is_closed()):
             self.search_thread.stop()
             self.search_cancelled = True
 
