@@ -24,6 +24,8 @@ class ResultBuffer:
       view.settings().set("auto_complete_commit_on_tab", False)
       view.settings().set("fade_fold_buttons", True)
       view.settings().set("gutter", True)
+      view.settings().set("highlight_line", True)
+      view.settings().set("draw_centered", False)
       view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
       view.set_syntax_file('Packages/FindInProject/FindInProject.sublime-syntax')
 
