@@ -25,10 +25,13 @@ The settings include options for
 
 ## Usage
 In normal contexts (using the default keymap) the following shortcut is available.
+
 Shortcut | Command | Description
 --- | --- | ---
 `ctrl`+`alt`+`f` | find_in_project | Opens FindInProject input panel
+
 When in a result view (using the default keymap) the following shortcuts are available.
+
 Shortcut | Command | Description
 --- | --- | ---
 `up` / `down` | find_in_project_next_line | Browse back/forward in results
