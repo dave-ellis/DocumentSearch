@@ -8,26 +8,8 @@ import sublime
 from . import filesearcher
 from . import resultbuffer
 
-## Remember
-# incase sensitive - done
-# status bar in top - no needed
-# mark result in buffer - done
-# copy line without getting the line number etc - not gonna do atm
-# search all project dirs and not just the first of them - done
-# skip large files - done
-# follow symlinks - done
-# attempt to detect binaries - done
-# concatenate lines if too long - done - remember the bad handling of multiple hits tho
-# make max line size configurable - done
-# project speicifc settings - should be doable through ST ?!?!
-# cancel search thread - done
-# fix num hits - done
-# fix result buffer folding - done
-# setting for size and encoding notifications - done
-# fix mouse + keyboard weird bug - done
-
-# to explain what happens with multiple hits on one line
 # cleanup this file and result buffer
+# test on other platforms (linux, osx)
 
 class FindInProject(sublime_plugin.TextCommand):
    """
@@ -105,7 +87,6 @@ class FindInProject(sublime_plugin.TextCommand):
       # Start search thread
       self.search_thread = filesearcher.FileSearcherThread(project_dirs, user_input, self.result_queue)
       self.search_thread.start()
-      print("M Started " + str(time.time()))
 
       # Come back in 1 ms to start handling results on an alternate thread
       sublime.set_timeout_async(self.handle_search_results, 1)

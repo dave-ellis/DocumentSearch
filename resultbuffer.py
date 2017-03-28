@@ -59,16 +59,24 @@ class ResultBuffer:
 
 def set_proper_scheme(view):
    """
-   Callback for setting color scheme
+   Set color scheme for result view
    """
-   if view.settings().get('color_scheme') != "Packages/FindInProject/FindInProject.hidden-tmTheme":
-      view.settings().set('color_scheme', "Packages/FindInProject/FindInProject.hidden-tmTheme")
+   # Check if user color scheme exists
+   color_scheme = "Packages/FindInProject/FindInProject.hidden-tmTheme"
+   try:
+      sublime.load_resource("Packages/User/FindInProject.hidden-tmTheme")
+      color_scheme = "Packages/User/FindInProject.hidden-tmTheme"
+   except:
+      pass
+
+   if view.settings().get('color_scheme') != color_scheme:
+      view.settings().set('color_scheme', color_scheme)
 
 
 class FindInProjectCommand:
    """
    Utility functions for find in project commands. Intended to be used with
-   sublime_plugin.TextCommand classes.
+   sublime_plugin.TextCommand class.
    """
    def selection_is_empty_line(self):
       """

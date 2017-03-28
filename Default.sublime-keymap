@@ -1,7 +1,16 @@
 [
+   {  "keys": ["ctrl+alt+f"],
+      "command": "find_in_project"
+   },
    {
       "keys" : ["enter"],
       "command": "find_in_project_open_result",
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+   },
+   {
+      "keys": ["up"],
+      "command": "find_in_project_next_line",
+      "args": { "forward": false },
       "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
    },
    {
@@ -20,12 +29,6 @@
       "keys": ["pagedown"],
       "command": "find_in_project_next_file",
       "args": { "forward": true },
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
-   },
-   {
-      "keys": ["up"],
-      "command": "find_in_project_next_line",
-      "args": { "forward": false },
       "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
    },
    {
@@ -57,26 +60,6 @@
    },
    {
       "keys": ["shift+right"],
-      "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
-   },
-   {
-      "keys": ["backspace"],
-      "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
-   },
-   {
-      "keys": ["delete"],
-      "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
-   },
-   {
-      "keys": ["tab"],
-      "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
-   },
-   {
-      "keys": [" "],
       "command": "noop",
       "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
    },
