@@ -46,7 +46,7 @@ class FileSearcherThread(threading.Thread):
       for path in self.paths:
          for root, dirs, files in os.walk(path, followlinks=self.follow_symlinks):
             # Remove the excluded dirs in-place so os.walk() won't recurse into them
-            dirs[:] = [d for d in dirs if d not in self.dirs_to_ignore]
+            dirs[:] = [d for d in dirs if d.lower() not in self.dirs_to_ignore]
             for file in files:
                if self._stop_requested():
                   self.result_queue.join()
