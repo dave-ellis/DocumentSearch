@@ -1,5 +1,5 @@
 # FindInProject
-Text search plugin for Sublime Text 3 projects. The plugin differentiates itself from similar plugins by having an interactive result view and an easily configurable search thread.
+Text search plugin for Sublime Text 3 projects. This is an alternative to the default "Find in files" command that comes with Sublime Text. It includes an interactive result view and a configurable search thread that runs in the background.
 
 ![example.gif](https://raw.githubusercontent.com/Wramberg/FindInProject/master/example.gif "Example of use")
 
