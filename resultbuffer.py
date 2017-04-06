@@ -113,7 +113,7 @@ class FindInProjectCommand:
       fileline = self.view.line(point)
       filenameraw = self.view.substr(fileline)
       filenameend = filenameraw.rfind('(')
-      return filenameraw[:filenameend]
+      return filenameraw[:filenameend].rstrip()
 
 
    def point_is_empty_line(self, point):
@@ -216,14 +216,13 @@ class FindInProjectOpenResult(FindInProjectCommand, sublime_plugin.TextCommand):
    Open search result marked by the cursor.
    """
    def run(self, edit):
-      win = sublime.active_window()
       (row, col) = self.view.rowcol(self.view.sel()[0].begin())
 
       # If cursor is standing on a filename line
       point = self.view.text_point(row, 0)
       if self.point_is_file(point):
          filename = self.get_filename_from_point(point)
-         win.open_file(filename)
+         self.view.window().open_file(filename)
          return
 
       # Go upwards and find filename
@@ -241,7 +240,7 @@ class FindInProjectOpenResult(FindInProjectCommand, sublime_plugin.TextCommand):
       lineNo = linecontent.split(':')[0]
       lineNo = lineNo.strip()
 
-      win.open_file(filename+":"+lineNo, sublime.ENCODED_POSITION)
+      self.view.window().open_file(filename+":"+lineNo, sublime.ENCODED_POSITION)
 
 
 class FindInProjectFold(FindInProjectCommand, sublime_plugin.TextCommand):
