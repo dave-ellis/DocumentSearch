@@ -39,12 +39,12 @@ class FindInProject(sublime_plugin.TextCommand):
       # See if we can find a selection to use as initial guess for target string
       initial_input_text = ""
       for region in view.sel():
-            if not region.empty():
-                # Get selected text
-                txt = view.substr(region)
-                if "\n" not in txt:
-                  initial_input_text = txt
-                  break
+         if not region.empty():
+            # Get selected text
+            txt = view.substr(region)
+            if "\n" not in txt:
+               initial_input_text = txt
+               break
 
       # Present user input panel
       win.show_input_panel("Find in project:", initial_input_text, self.input_panel_on_done, None, None)
@@ -93,7 +93,7 @@ class FindInProject(sublime_plugin.TextCommand):
       """
       Handle search results that search thread places on the result queue
       """
-      while True:
+      while self.search_thread.isAlive() or (self.result_queue.empty() == False):
          self.update_status()
 
          # Check if result buffer has been closed - in this case we cancel the
@@ -106,8 +106,7 @@ class FindInProject(sublime_plugin.TextCommand):
          if not self.result_queue.empty():
             result = self.result_queue.get()
 
-            # Update number of hits but ensure it does not include warning/error
-            # strings
+            # Update number of hits but ensure it does not include warning/error strings
             if len(result["result"]):
                if 0 not in result["result"]:
                   self.num_hits = self.num_hits + len(result["result"])
@@ -123,10 +122,8 @@ class FindInProject(sublime_plugin.TextCommand):
                self.result_buffer.insert_result(result)
             self.result_queue.task_done()
 
-         # Are we done ?
-         if (self.search_thread.isAlive() == False) and (self.result_queue.empty() == True):
-            self.set_final_status()
-            break
+      # We are done searching
+      self.set_final_status()
 
    def update_status(self):
       """

@@ -19,10 +19,10 @@ class FileSearcherThread(threading.Thread):
       self.result_queue = result_queue
 
       settings = sublime.load_settings('FindInProject.sublime-settings')
-      self.exts_to_ignore = settings.get('find_in_project_ignore_extensions', [])
-      self.exts_to_ignore = [x.lower() for x in self.exts_to_ignore]
-      self.dirs_to_ignore = settings.get('find_in_project_ignore_dirs', [])
-      self.dirs_to_ignore = [x.lower() for x in self.dirs_to_ignore]
+      exts_to_ignore = settings.get('find_in_project_ignore_extensions', [])
+      self.exts_to_ignore = [x.lower() for x in exts_to_ignore]
+      dirs_to_ignore = settings.get('find_in_project_ignore_dirs', [])
+      self.dirs_to_ignore = [x.lower() for x in dirs_to_ignore]
       self.encodings = settings.get('find_in_project_encodings', ["utf-8"])
       self.skip_binary = settings.get('find_in_project_skip_binary_files', True)
       self.max_file_size = settings.get('find_in_project_max_file_size_mb', 20)*1000000
@@ -30,6 +30,7 @@ class FileSearcherThread(threading.Thread):
       self.max_line_len = settings.get('find_in_project_max_line_len', 100)
       self.show_warning_on_open_fail = settings.get('find_in_project_show_warning_on_open_failure', False)
       self.show_warning_size_skip = settings.get('find_in_project_show_warning_on_size_skip', False)
+      self.show_warning_binary_skip = settings.get('find_in_project_show_warning_on_binary_skip', False)
 
    def stop(self):
       """
@@ -40,8 +41,8 @@ class FileSearcherThread(threading.Thread):
 
    def run(self):
       """
-      Override the run method from threading.Thread to do a search then the
-      thread is tarted. This should not be called directly obviously.
+      Override the run method from threading.Thread to do a search when the
+      thread is started. This should not be called directly obviously.
       """
       for path in self.paths:
          for root, dirs, files in os.walk(path, followlinks=self.follow_symlinks):
@@ -49,7 +50,6 @@ class FileSearcherThread(threading.Thread):
             dirs[:] = [d for d in dirs if d.lower() not in self.dirs_to_ignore]
             for file in files:
                if self._stop_requested():
-                  self.result_queue.join()
                   return
 
                file_ext = os.path.splitext(file)[1][1:]
@@ -61,7 +61,7 @@ class FileSearcherThread(threading.Thread):
                if file_size > self.max_file_size:
                   result = collections.OrderedDict()
                   if self.show_warning_size_skip:
-                     result[0] = "Skipped file due to size (%.2f MB)" % (file_size/1000000., )
+                     result[0] = "Skipped file due to size (%.2f MB)." % (file_size/1000000., )
                else:
                   result = self._search_file(filepath)
 
@@ -91,7 +91,10 @@ class FileSearcherThread(threading.Thread):
                for line_num, line_content in enumerate(target_file, start=1):
                   # Check for binary file
                   if self.skip_binary and '\0' in line_content:
-                     return collections.OrderedDict()
+                     ret = collections.OrderedDict()
+                     if self.show_warning_binary_skip:
+                        ret[0] = "Skipped binary file."
+                     return ret
 
                   # Search line for target string
                   if self.target_string.lower() in line_content.lower():

@@ -55,6 +55,10 @@
   // to false.
   "find_in_project_show_warning_on_size_skip": false,
 
+  // Show warning in search results when skipping a binary file. Defaults to
+  // false.
+  "find_in_project_show_warning_on_binary_skip": false,
+
   // Cancel search when exceeding this amount of hits. Set to 0 to disable.
   // Defaults to 5000.
   "find_in_project_excessive_hits_count": 5000,
