@@ -1,5 +1,5 @@
 [
-   {  "keys": ["ctrl+alt+f"],
+   {  "keys": ["ctrl+shift+f"],
       "command": "find_in_project"
    },
    {

@@ -28,7 +28,7 @@ In normal contexts (using the default keymap) the following shortcut is availabl
 
 Shortcut | Command | Description
 --- | --- | ---
-`ctrl`+`alt`+`f` | find_in_project | Opens FindInProject input panel
+`ctrl`+`shift`+`f` | find_in_project | Opens FindInProject input panel
 
 When in a result view (using the default keymap) the following shortcuts are available.
 
@@ -38,3 +38,5 @@ Shortcut | Command | Description
 `Pageup` / `Pagedown` | find_in_project_next_file | Browse back/forward between files
 `Left` / `Right` | find_in_project_fold | Fold/Unfold results within the selected file
 `Enter` | find_in_project_open_result | Open currently selected result
+
+For details see the keymap file available through the *Preferences->Package Settings->FindInProject* menu.
