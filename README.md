@@ -38,6 +38,3 @@ Shortcut | Command | Description
 `Pageup` / `Pagedown` | find_in_project_next_file | Browse back/forward between files
 `Left` / `Right` | find_in_project_fold | Fold/Unfold results within the selected file
 `Enter` | find_in_project_open_result | Open currently selected result
-
-## Future development
-If others show interest in the plugin it might be developed further in the future.
