@@ -10,7 +10,7 @@
   // Directories to ignore (case-insensitive). While traversing the project the
   // search does not descend into any directory with the specified name(s).
   // Defaults to none.
-  "find_in_project_ignore_dirs": [".git", "tmp", "DataHawk", "KafkaTest", "tornado-4.3"],
+  "find_in_project_ignore_dirs": [".git", "tmp", "$RECYCLE.BIN"],
 
   // File extensions to ignore (case-insensitive). While traversing the project
   // the search skips all files that ends with the specified extensions.
