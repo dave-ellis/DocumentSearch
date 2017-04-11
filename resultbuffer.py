@@ -26,6 +26,7 @@ class ResultBuffer:
         view.settings().set("gutter", True)
         view.settings().set("highlight_line", True)
         view.settings().set("draw_centered", False)
+        view.settings().set("word_wrap", False)
         view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
         view.set_syntax_file('Packages/FindInProject/FindInProject.sublime-syntax')
 
