@@ -9,7 +9,7 @@ from . import filesearcher
 from . import resultbuffer
 
 
-class FindInProject(sublime_plugin.TextCommand):
+class FindInProject(sublime_plugin.WindowCommand):
     """
     Find In Project - a Sublime Text 3 plugin for text search in projects. The
     search is performed in a background thread and results are presented in an
@@ -29,7 +29,7 @@ class FindInProject(sublime_plugin.TextCommand):
         settings = sublime.load_settings('FindInProject.sublime-settings')
         self.excessive_hits_count = settings.get('find_in_project_excessive_hits_count', 5000)
 
-    def run(self, edit):
+    def run(self):
         """
         Show input panel to get target string for search
         """
