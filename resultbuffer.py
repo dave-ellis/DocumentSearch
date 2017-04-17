@@ -37,6 +37,9 @@ class ResultBuffer:
         """
         Insert results for a file into the buffer.
         """
+        if len(result) == 0:
+            return
+
         # Add file name to start of result block
         no_results = str(len(result["result"]))
         result_str = ("\n" + result["filepath"] + " (" + no_results + ")\n")

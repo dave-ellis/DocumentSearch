@@ -17,15 +17,6 @@ class FindInProject(sublime_plugin.WindowCommand):
     """
     def __init__(self, view):
         sublime_plugin.TextCommand.__init__(self, view)
-        self.result_queue = None
-        self.result_buffer = None
-        self.search_thread = None
-        self.status_string_idx = 0
-        self.num_hits = 0
-        self.num_file_hits = 0
-        self.last_status_update = 0
-        self.search_cancelled = False
-
         settings = sublime.load_settings('FindInProject.sublime-settings')
         self.excessive_hits_count = settings.get('find_in_project_excessive_hits_count', 5000)
 
@@ -66,13 +57,14 @@ class FindInProject(sublime_plugin.WindowCommand):
         if ("folders" not in project_data) or len(project_data["folders"]) == 0:
             return
 
-        # Reset member vars for new search
+        # Init member vars for new search
         self.result_queue = queue.Queue()
-        self.status_string_idx = 0;
         self.num_hits = 0
         self.num_file_hits = 0
         self.last_status_update = 0
         self.search_cancelled = False
+        self.files_searched = 0
+        self.search_start_time = time.time()
 
         # Search all project dirs
         project_dirs = []
@@ -108,10 +100,14 @@ class FindInProject(sublime_plugin.WindowCommand):
                 result = self.result_queue.get()
 
                 # Update number of hits but ensure it does not include warning/error strings
-                if len(result["result"]):
+                if "result" in result and len(result["result"]):
                     if 0 not in result["result"]:
                         self.num_hits = self.num_hits + len(result["result"])
                         self.num_file_hits = self.num_file_hits + 1
+
+                # Update number of files searched
+                if "files_searched" in result:
+                    self.files_searched = result["files_searched"]
 
                 # If we reach excessive limit start dropping results and stop search thread
                 if (self.excessive_hits_count != 0) and (self.num_hits > self.excessive_hits_count):
@@ -120,7 +116,9 @@ class FindInProject(sublime_plugin.WindowCommand):
                     break
 
                 # Update result view
-                self.result_buffer.insert_result(result)
+                if "result" in result:
+                    self.result_buffer.insert_result(result)
+
                 self.result_queue.task_done()
 
         # We are done searching
@@ -130,20 +128,15 @@ class FindInProject(sublime_plugin.WindowCommand):
         """
         Update text in status bar
         """
-        if time.time() > (self.last_status_update + 0.2):
-            self.last_status_update = time.time()
+        cur_time = time.time()
+        if cur_time > (self.last_status_update + 0.2):
+            self.last_status_update = cur_time
+            cur_search_time = cur_time - self.search_start_time
             win = sublime.active_window()
-            self.status_string_idx = self.status_string_idx + 1
-
-            if self.status_string_idx == 0:
-                win.status_message("FindInProject: Searching in project | [%i hits across %i files so far]" % (self.num_hits, self.num_file_hits))
-            elif self.status_string_idx == 1:
-                win.status_message("FindInProject: Searching in project / [%i hits across %i files so far]" % (self.num_hits, self.num_file_hits))
-            elif self.status_string_idx == 2:
-                win.status_message("FindInProject: Searching in project - [%i hits across %i files so far]" % (self.num_hits, self.num_file_hits))
-            elif self.status_string_idx > 2:
-                win.status_message("FindInProject: Searching in project \ [%i hits across %i files so far]" % (self.num_hits, self.num_file_hits))
-                self.status_string_idx = 0
+            status_msg = "FindInProject: Searching project"
+            status_msg += " [%i hits across %i files so far]" % (self.num_hits, self.num_file_hits)
+            status_msg += " [%i files searched in %.1f seconds]" % (self.files_searched, cur_search_time)
+            win.status_message(status_msg)
 
     def set_final_status(self):
         """
@@ -153,4 +146,8 @@ class FindInProject(sublime_plugin.WindowCommand):
         if self.search_cancelled:
             win.status_message("FindInProject: Search cancelled (due to close or excessive number of hits)")
         else:
-            win.status_message("FindInProject: Search done [%i hits across %i files]" % (self.num_hits, self.num_file_hits))
+            cur_search_time = time.time() - self.search_start_time
+            status_msg = "FindInProject: Search finished"
+            status_msg += " [%i hits across %i files]" % (self.num_hits, self.num_file_hits)
+            status_msg += " [%i files searched in %.1f seconds]" % (self.files_searched, cur_search_time)
+            win.status_message(status_msg)

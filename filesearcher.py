@@ -14,9 +14,11 @@ class FileSearcherThread(threading.Thread):
     def __init__(self, paths, target_string, result_queue):
         super().__init__()
         self._stop_thread = threading.Event()
-        self.paths = paths
-        self.target_string = target_string
-        self.result_queue = result_queue
+        self._paths = paths
+        self._target_string = target_string
+        self._result_queue = result_queue
+        self._files_searched = 0
+        self._files_searched_last_update = 0
 
         settings = sublime.load_settings('FindInProject.sublime-settings')
         exts_to_ignore = settings.get('find_in_project_ignore_extensions', [])
@@ -43,7 +45,7 @@ class FileSearcherThread(threading.Thread):
         Override the run method from threading.Thread to do a search when the
         thread is started. This should not be called directly obviously.
         """
-        for path in self.paths:
+        for path in self._paths:
             for root, dirs, files in os.walk(path, followlinks=self.follow_symlinks):
                 # Remove the excluded dirs in-place so os.walk() won't recurse into them
                 dirs[:] = [d for d in dirs if d.lower() not in self.dirs_to_ignore]
@@ -63,13 +65,24 @@ class FileSearcherThread(threading.Thread):
                             result[0] = "Skipped file due to size (%.2f MB)." % (file_size/1000000., )
                     else:
                         result = self._search_file(filepath)
+                        self._files_searched = self._files_searched + 1
 
                     if len(result):
-                        ret = {"filepath": filepath, "result": result}
-                        self.result_queue.put(ret)
+                        ret = {"filepath": filepath, "result": result, "files_searched": self._files_searched}
+                        self._result_queue.put(ret)
+                        self._files_searched_last_update = time.time()
+                    elif time.time() > (self._files_searched_last_update + 0.2):
+                        update = {"files_searched": self._files_searched}
+                        self._result_queue.put(update)
+                        self._files_searched_last_update = time.time()
+
+
+        # Send a final update on files searched
+        update = {"files_searched": self._files_searched}
+        self._result_queue.put(update)
 
         # Wait until all results have been read from the queue - then terminate
-        self.result_queue.join()
+        self._result_queue.join()
 
     def _stop_requested(self):
         """
@@ -83,7 +96,7 @@ class FileSearcherThread(threading.Thread):
         Search a file for the target string. Skip binaries if configured.
         """
         ret = collections.OrderedDict()
-        target_len = len(self.target_string)
+        target_len = len(self._target_string)
         for enc in self.encodings:
             try:
                 with open(path, "r", encoding=enc) as target_file:
@@ -96,7 +109,7 @@ class FileSearcherThread(threading.Thread):
                             return ret
 
                         # Search line for target string
-                        if self.target_string.lower() in line_content.lower():
+                        if self._target_string.lower() in line_content.lower():
                             if len(line_content) > (self.max_line_len + target_len):
                                 line_content = self._limit_line(line_content)
                             ret[line_num] = line_content
@@ -116,13 +129,13 @@ class FileSearcherThread(threading.Thread):
         Limit the provided line according to the settings.
         """
         single_side_len = int(self.max_line_len/2)
-        loc = line.lower().find(self.target_string)
+        loc = line.lower().find(self._target_string)
 
         start = loc - single_side_len
         if start < 0:
             start = 0
 
-        end = loc + len(self.target_string)
+        end = loc + len(self._target_string)
         end = end + single_side_len
         if (end >= len(line)):
             end = len(line)-1
