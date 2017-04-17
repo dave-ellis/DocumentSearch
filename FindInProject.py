@@ -48,6 +48,10 @@ class FindInProject(sublime_plugin.WindowCommand):
         if len(user_input) == 0:
             return
 
+        if "\n" in user_input:
+            sublime.message_dialog("FindInProject currently only supports single line searches")
+            return
+
         # Get active window and view
         win = sublime.active_window()
         view = win.active_view()
