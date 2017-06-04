@@ -4,11 +4,15 @@ Text search plugin for Sublime Text 3 projects. This is an alternative to the de
 ![example.gif](https://raw.githubusercontent.com/Wramberg/FindInProject/master/example.gif "Example of use")
 
 ## Installation
-The plugin is tested on Windows and Linux but should also work on macOS. It is currently only available on GitHub but might be uploaded to https://packagecontrol.io/ at a later time. To install from GitHub:
+The plugin is tested on Windows and Linux but should also work on macOS. To install it from https://packagecontrol.io/ do the following:
+
+1. Open the command palette and find "Package Control: Install Package"
+2. Search for FindInProject and install.
+
+To install from GitHub do the following:
 
 1. Locate Sublime Text packages folder by choosing *Preferences -> Browse Packages...* in the menu
 2. Clone or download git repository into a new folder named "FindInProject" under the packages folder
-3. Start searching your project
 
 ## Configuration
 All configuration is available through the *Preferences->Package Settings->FindInProject* menu. This includes
