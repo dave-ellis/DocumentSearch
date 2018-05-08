@@ -1,71 +1,71 @@
 [
-   {  "keys": ["ctrl+shift+f"],
-      "command": "find_in_project"
+   {  "keys": ["ctrl+alt+f"],
+      "command": "document_search"
    },
    {
       "keys" : ["enter"],
-      "command": "find_in_project_open_result",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "command": "document_search_open_result",
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["up"],
-      "command": "find_in_project_next_line",
+      "command": "document_search_next_line",
       "args": { "forward": false },
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["down"],
-      "command": "find_in_project_next_line",
+      "command": "document_search_next_line",
       "args": { "forward": true },
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["pageup"],
-      "command": "find_in_project_next_file",
+      "command": "document_search_next_file",
       "args": { "forward": false },
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["pagedown"],
-      "command": "find_in_project_next_file",
+      "command": "document_search_next_file",
       "args": { "forward": true },
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["right"],
-      "command": "find_in_project_fold",
+      "command": "document_search_fold",
       "args": { "fold": false },
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["left"],
-      "command": "find_in_project_fold",
+      "command": "document_search_fold",
       "args": { "fold": true },
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["shift+down"],
       "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["shift+up"],
       "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["shift+left"],
       "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["shift+right"],
       "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
    {
       "keys": ["ctrl+a"],
       "command": "noop",
-      "context": [{ "key": "selector", "operator": "equal", "operand": "text.findinproject" }]
+      "context": [{ "key": "selector", "operator": "equal", "operand": "text.DocumentSearch" }]
    },
 ]

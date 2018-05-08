@@ -1,0 +1,16 @@
+%YAML 1.2
+---
+name: DocumentSearch
+hidden: true
+file_extensions:
+  - DocumentSearch
+scope: text.DocumentSearch
+contexts:
+  main:
+    - match: '^\s*[0-9]+'
+      scope: DocumentSearch.linenumber
+    - match: '^[\r\n]'
+      scope: DocumentSearch.emptyline
+    - match: '^[^" "].*'
+      scope: DocumentSearch.filename
+

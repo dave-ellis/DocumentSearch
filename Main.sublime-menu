@@ -10,22 +10,22 @@
                 "children":
                 [
                     {
-                        "caption": "FindInProject",
+                        "caption": "Document Search",
                         "children":
                         [
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/FindInProject/FindInProject.sublime-settings"},
+                                "args": {"file": "${packages}/DocumentSearch/DocumentSearch.sublime-settings"},
                                 "caption": "Settings – Default"
                             },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/User/FindInProject.sublime-settings"},
+                                "args": {"file": "${packages}/User/DocumentSearch.sublime-settings"},
                                 "caption": "Settings – User"
                             },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/FindInProject/Default.sublime-keymap"},
+                                "args": {"file": "${packages}/DocumentSearch/Default.sublime-keymap"},
                                 "caption": "Key Bindings – Default"
                             },
                             {
@@ -54,17 +54,17 @@
                             },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/FindInProject/FindInProject.hidden-tmTheme"},
+                                "args": {"file": "${packages}/DocumentSearch/DocumentSearch.hidden-tmTheme"},
                                 "caption": "Color Scheme - Default"
                             },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/User/FindInProject.hidden-tmTheme"},
+                                "args": {"file": "${packages}/User/DocumentSearch.hidden-tmTheme"},
                                 "caption": "Color Scheme - User"
                             },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/FindInProject/README.md"},
+                                "args": {"file": "${packages}/DocumentSearch/README.md"},
                                 "caption": "Readme"
                             },
                         ]

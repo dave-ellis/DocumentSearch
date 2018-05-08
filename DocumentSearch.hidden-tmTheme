@@ -2,7 +2,7 @@
 <plist version="1.0">
 <dict>
    <key>name</key>
-   <string>Found in project</string>
+   <string>Matches</string>
    <key>settings</key>
    <array>
       <dict>
@@ -57,7 +57,7 @@
          <key>name</key>
          <string>Linenumbers</string>
          <key>scope</key>
-         <string>findinproject.linenumber</string>
+         <string>DocumentSearch.linenumber</string>
          <key>settings</key>
          <dict>
             <key>foreground</key>
@@ -69,7 +69,7 @@
          <key>name</key>
          <string>Filenames</string>
          <key>scope</key>
-         <string>findinproject.filename</string>
+         <string>DocumentSearch.filename</string>
          <key>settings</key>
          <dict>
             <key>foreground</key>
@@ -82,7 +82,7 @@
          <key>name</key>
          <string>Target string</string>
          <key>scope</key>
-         <string>findinproject.targetstring</string>
+         <string>DocumentSearch.targetstring</string>
          <key>settings</key>
          <dict>
             <key>foreground</key>

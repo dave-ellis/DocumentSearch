@@ -16,7 +16,7 @@ class ResultBuffer:
         view = self.win.new_file()
 
         # Configure view
-        view.set_name("Found in project")
+        view.set_name("Matches")
         view.set_scratch(True)
         self.win.focus_view(view)
 
@@ -28,7 +28,7 @@ class ResultBuffer:
         view.settings().set("draw_centered", False)
         view.settings().set("word_wrap", False)
         view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
-        view.set_syntax_file('Packages/FindInProject/FindInProject.sublime-syntax')
+        view.set_syntax_file('Packages/DocumentSearch/DocumentSearch.sublime-syntax')
 
         # Save view for later
         self.view = view
@@ -50,7 +50,7 @@ class ResultBuffer:
             if result_str[-1] != "\n":
                 result_str += "\n"
 
-        self.view.run_command("find_in_project_insert_text",
+        self.view.run_command("document_search_insert_text",
                                      {"args": {'text': result_str, 'target_string': self.target_string}})
 
     def is_closed(self):
@@ -69,10 +69,10 @@ def set_proper_scheme(view):
     Set color scheme for result view
     """
     # Check if user color scheme exists
-    color_scheme = "Packages/FindInProject/FindInProject.hidden-tmTheme"
+    color_scheme = "Packages/DocumentSearch/DocumentSearch.hidden-tmTheme"
     try:
-        sublime.load_resource("Packages/User/FindInProject.hidden-tmTheme")
-        color_scheme = "Packages/User/FindInProject.hidden-tmTheme"
+        sublime.load_resource("Packages/User/DocumentSearch.hidden-tmTheme")
+        color_scheme = "Packages/User/DocumentSearch.hidden-tmTheme"
     except:
         pass
 
@@ -80,9 +80,9 @@ def set_proper_scheme(view):
         view.settings().set('color_scheme', color_scheme)
 
 
-class FindInProjectCommand:
+class DocumentSearchCommand:
     """
-    Utility functions for find in project commands. Intended to be used with
+    Utility functions for Document Search commands. Intended to be used with
     sublime_plugin.TextCommand class.
     """
     def selection_is_empty_line(self):
@@ -90,7 +90,7 @@ class FindInProjectCommand:
         Check if selection is an empty line
         """
         scope = self.view.scope_name(self.view.sel()[0].begin())
-        if "findinproject.emptyline" in scope:
+        if "DocumentSearch.emptyline" in scope:
             return True
         return False
 
@@ -106,7 +106,7 @@ class FindInProjectCommand:
         Check if provided point is on a filename
         """
         scope = self.view.scope_name(point)
-        if "findinproject.filename" in scope:
+        if "DocumentSearch.filename" in scope:
             return True
         return False
 
@@ -125,15 +125,15 @@ class FindInProjectCommand:
         Check if provided point is on an empty line
         """
         scope = self.view.scope_name(point)
-        if "findinproject.emptyline" in scope:
+        if "DocumentSearch.emptyline" in scope:
             return True
         return False
 
 
-class FindInProjectInsertText(FindInProjectCommand, sublime_plugin.TextCommand):
+class DocumentSearchInsertText(DocumentSearchCommand, sublime_plugin.TextCommand):
     """
     Insert a blob of text in the view and add regions for all occurences of the
-    target string using the 'findinproject.targetstring' scope.
+    target string using the 'DocumentSearch.targetstring' scope.
     """
     def __init__(self, args):
         super().__init__(args)
@@ -172,14 +172,14 @@ class FindInProjectInsertText(FindInProjectCommand, sublime_plugin.TextCommand):
             target_regions.append(target_region)
             start_point = target_region.end()
 
-        key = "FindInProjectHighlight%i" % (self.region_key_postfix_counter, )
+        key = "DocumentSearchHighlight%i" % (self.region_key_postfix_counter, )
         self.region_key_postfix_counter = self.region_key_postfix_counter + 1
         # flags = sublime.DRAW_NO_OUTLINE
         flags = sublime.DRAW_NO_FILL
-        self.view.add_regions(key, target_regions, "findinproject.targetstring", flags=flags)
+        self.view.add_regions(key, target_regions, "DocumentSearch.targetstring", flags=flags)
 
 
-class FindInProjectNextLine(FindInProjectCommand, sublime_plugin.TextCommand):
+class DocumentSearchNextLine(DocumentSearchCommand, sublime_plugin.TextCommand):
     """
     Go up or down a line in the result view but skip empty lines.
     """
@@ -197,7 +197,7 @@ class FindInProjectNextLine(FindInProjectCommand, sublime_plugin.TextCommand):
         self.view.show(target)
 
 
-class FindInProjectNextFile(FindInProjectCommand, sublime_plugin.TextCommand):
+class DocumentSearchNextFile(DocumentSearchCommand, sublime_plugin.TextCommand):
     """
     Go up/down to next/previous file.
     """
@@ -215,7 +215,7 @@ class FindInProjectNextFile(FindInProjectCommand, sublime_plugin.TextCommand):
                 return
 
 
-class FindInProjectOpenResult(FindInProjectCommand, sublime_plugin.TextCommand):
+class DocumentSearchOpenResult(DocumentSearchCommand, sublime_plugin.TextCommand):
     """
     Open search result marked by the cursor.
     """
@@ -247,7 +247,7 @@ class FindInProjectOpenResult(FindInProjectCommand, sublime_plugin.TextCommand):
         self.view.window().open_file(filename+":"+lineNo, sublime.ENCODED_POSITION)
 
 
-class FindInProjectFold(FindInProjectCommand, sublime_plugin.TextCommand):
+class DocumentSearchFold(DocumentSearchCommand, sublime_plugin.TextCommand):
     """
     Fold/Unfold results for currently selected file.
     """
