@@ -2,9 +2,9 @@ import time
 import queue
 import threading
 import os
-import glob
 import traceback
 import re
+import mimetypes
 
 import sublime_plugin
 import sublime
@@ -12,6 +12,15 @@ import sublime
 from . import filesearcher
 from . import resultbuffer
 from . import tfidf_search
+from . import pagerank
+
+
+# Split terms by non-word characters
+TERM_SPLITTER = re.compile(r'\W+', re.UNICODE)
+
+#  Page references are any word characters surrounded by double square brackets
+DEFAULT_PAGE_REF_PATTERN = r'(?:\[\[)(\w+)(?:\]\])'
+
 
 class DocumentSearch(sublime_plugin.WindowCommand):
     """Document Search - search in all files in project.
@@ -20,11 +29,18 @@ class DocumentSearch(sublime_plugin.WindowCommand):
     * Search results displayed in a scratch view
     """
 
-
     def __init__(self, view):
         sublime_plugin.TextCommand.__init__(self, view)
         settings = sublime.load_settings('DocumentSearch.sublime-settings')
         self.excessive_hits_count = settings.get('document_search_excessive_hits_count', 5000)
+
+        exts_to_ignore = settings.get('document_search_ignore_extensions', [])
+        self.exts_to_ignore = [x.lower() for x in exts_to_ignore]
+        dirs_to_ignore = settings.get('document_search_ignore_dirs', [])
+        self.dirs_to_ignore = [x.lower() for x in dirs_to_ignore]
+
+        page_ref_pattern = settings.get("document_search_page_ref_pattern", DEFAULT_PAGE_REF_PATTERN)
+        self.page_ref_matcher = re.compile(page_ref_pattern, re.UNICODE)
 
     def run(self):
         """Show search panel"""
@@ -50,42 +66,78 @@ class DocumentSearch(sublime_plugin.WindowCommand):
     def scan_project(self):
         """Scan the documents"""
 
-        self.table = tfidf_search.TfIdfTable()
+        self._idf_table = tfidf_search.TfIdfTable()
+        self._graph = pagerank.Graph()
 
         for folder in self.search_dirs:
             print("Scanning directory:", folder)
-            for dirname, _, files in self.list_dir_tree(folder):
-                for file in files:
-                    try:
-                        filename = os.path.join(dirname, file)
-                        words = self.parse_document(filename)
-                        self.table.append_document(filename, words)
-                    except Exception as e:
-                        print("Unable to parse file:", filename)
-                        traceback.print_exc()
+            for dirname, _, files in self.list_dir_tree(folder):                
+                if dirname.lower() in self.dirs_to_ignore:
+                    continue
 
-        print("Scanned", self.table.size(), "documents")
+                for file in files:
+                    file_ext = os.path.splitext(file)[1][1:]
+                    if file_ext.lower() in self.exts_to_ignore:
+                        continue
+
+                    type, encoding = mimetypes.guess_type(file)
+                    if type is not None and not type.startswith('text'):
+                        continue
+
+                    self.scan_file(dirname, file)
+
+        print("Scanned", len(self._idf_table), "documents")
+
+    def is_binary_string(self, file):
+        textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
+        bytes = open(file, 'rb').read(1024)
+        return  lambda bytes: bool(bytes.translate(None, textchars))
+
+    def scan_file(self, dirname, file):
+        filename = os.path.join(dirname, file)
+        pagename = os.path.splitext(file)[0]
+        try:
+            # Scan contents
+            terms = []
+            page_refs = []
+            with open(filename, "rt") as f:
+                while True:
+                    try:
+                        line = f.readline()
+                        if not line:
+                            break
+
+                        terms.extend(self._extract_terms(line))
+                        page_refs.extend(self._extract_page_refs(line))
+                    except UnicodeDecodeError:
+                        print('Failed to read line in', filename)
+
+            # Append to IDF
+            self._idf_table.append_document(filename, terms)
+
+            # Append to PageRank
+            node = self._graph.add_node_with_refs(pagename, *page_refs)
+            node.filename = filename
+
+        except:
+            print("Unable to scan file:", filename)
+            traceback.print_exc()
 
     def list_dir_tree(self, directory):
         for dir, dirnames, files in os.walk(directory):
             dirnames[:] = [dirname for dirname in dirnames]
             yield dir, dirnames, files
 
-    def parse_document(self, file):
-        words = []
-        with open(file, "r") as f:
-            for line in f:
-                terms = self.extract_terms(line)
-                words.extend(terms)
+    def _extract_terms(self, line):
+        return [x.lower() for x in TERM_SPLITTER.split(line) if x != '']
 
-        return words
-
-    def extract_terms(self, line):
-        return [x.lower() for x in re.compile(r'\W+', re.UNICODE).split(line) if x != '']
+    def _extract_page_refs(self, line):
+        return self.page_ref_matcher.findall(line)
 
     def prepare_search_text(self):
         """Prepare the initial search text"""
 
+        # If text is selected then return that
         view = sublime.active_window().active_view()
         for region in view.sel():
             if not region.empty():
@@ -94,9 +146,11 @@ class DocumentSearch(sublime_plugin.WindowCommand):
                 if "\n" not in txt:
                     return txt
 
-        if self.search_text:
+        # Else use previous search text
+        try:
             return self.search_text
-        else:
+        except AttributeError:
+            # Otherwise just use empty string
             return ""
 
     def run_search(self, search_text):
@@ -115,7 +169,6 @@ class DocumentSearch(sublime_plugin.WindowCommand):
         win = sublime.active_window()
         view = win.active_view()
 
-
         # Init member vars for new search
         self.result_queue = queue.Queue()
         self.num_hits = 0
@@ -128,8 +181,38 @@ class DocumentSearch(sublime_plugin.WindowCommand):
         # Initialize result buffer/view
         self.result_buffer = resultbuffer.ResultBuffer(win, search_text)
 
-        # Start search thread
-        matching_files = self.table.search(search_text)
+        # Calculate term scores
+        term_scores = self._idf_table.search(search_text)
+        sum_scores = sum(score for _, score in term_scores)
+        # print('sum_scores:', sum_scores, 'term_scores:', term_scores)
+
+        # Calculate rank scores
+        page_rank = pagerank.PageRank(self._graph)
+        rank_scores, iteration_count = page_rank.calculate()
+
+        # Prepare mapping of matched filenames to rank value
+        sum_ranks = 0.0
+        rank_mappings = {}
+        for pagename, rank in rank_scores:
+            node = self._graph.get_node_by_id(pagename)
+            if hasattr(node, 'filename'):
+                sum_ranks += rank
+                rank_mappings[node.filename] = rank
+            else:
+                print("Missing filename for page", pagename)
+        # print('sum_ranks:', sum_ranks, 'rank_mappings:', rank_mappings)
+
+        # Prepare list of files with match value = weighted average of score and rank
+        scores_weight = 1.0/2.0*sum_scores
+        ranks_weight = 1.0/2.0*sum_ranks
+        match_scores = list((filename, scores_weight*score + ranks_weight*rank_mappings[filename])
+                            for filename, score in term_scores
+                            if filename in rank_mappings)
+        # print('match_scores:', match_scores)
+
+        match_scores.sort(reverse=True, key=lambda x: x[1])
+        matching_files = list(match[0] for match in match_scores)
+
         self.search_thread = filesearcher.FileSearcherThread(matching_files, search_text, self.result_queue)
         self.search_thread.start()
 

@@ -22,10 +22,6 @@ class FileSearcherThread(threading.Thread):
         self._files_searched_last_update = 0
 
         settings = sublime.load_settings('DocumentSearch.sublime-settings')
-        exts_to_ignore = settings.get('document_search_ignore_extensions', [])
-        self.exts_to_ignore = [x.lower() for x in exts_to_ignore]
-        dirs_to_ignore = settings.get('document_search_ignore_dirs', [])
-        self.dirs_to_ignore = [x.lower() for x in dirs_to_ignore]
         self.encodings = settings.get('document_search_encodings', ["utf-8"])
         self.skip_binary = settings.get('document_search_skip_binary_files', True)
         self.max_file_size = settings.get('document_search_max_file_size_mb', 20)*1000000
@@ -49,10 +45,6 @@ class FileSearcherThread(threading.Thread):
         for filepath in self._matching_files:
             if self._stop_requested():
                 return
-
-            file_ext = os.path.splitext(filepath)[1][1:]
-            if file_ext.lower() in self.exts_to_ignore:
-                continue
 
             file_size = os.path.getsize(filepath)
             if file_size > self.max_file_size:

@@ -22,7 +22,7 @@ class TfIdfTable:
 
         self.documents.append([doc_name, doc_term_normals])
 
-    def search(self, search):
+    def search(self, search, threshold=0.0):
         search_terms = [x.lower() for x in search.split()]
 
         # Count the search terms
@@ -31,7 +31,7 @@ class TfIdfTable:
             search_term_counts[term] = search_term_counts.get(term, 0.0) + 1.0
 
         # Normalise doc term counts
-        length  = float(len(search_terms))
+        length = float(len(search_terms))
         search_term_normals = {}
         for term, count in search_term_counts.items():
             search_term_normals[term] = count / length
@@ -51,13 +51,10 @@ class TfIdfTable:
 
                     score += (search_term_normal + doc_term_normal) / overall_term_count
 
-            if score > 0:
+            if score > threshold:
                 term_scores.append((doc[0], score))
 
-        term_scores.sort(reverse=True, key=lambda x: x[1])
+        return  term_scores
 
-        matching_files = (term_score[0] for term_score in term_scores)
-        return list(matching_files)
-
-    def size(self):
+    def __len__(self):
         return len(self.documents)

@@ -62,4 +62,9 @@
   // Cancel search when exceeding this amount of hits. Set to 0 to disable.
   // Defaults to 5000.
   "document_search_excessive_hits_count": 5000,
+
+  // Regex matching page references
+  // Default pattern matches double square brackets around word characters, 
+  // eg. [[SamplePageRef]]
+  "document_search_page_ref_pattern": "(?:\\[\\[)(\\w+)(?:\\]\\])"
 }
