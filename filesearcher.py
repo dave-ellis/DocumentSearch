@@ -5,6 +5,8 @@ import time
 
 import sublime
 
+from . import scanners
+
 
 class FileSearcherThread(threading.Thread):
     """
@@ -21,15 +23,10 @@ class FileSearcherThread(threading.Thread):
         self._files_searched = 0
         self._files_searched_last_update = 0
 
-        settings = sublime.load_settings('DocumentSearch.sublime-settings')
-        self.encodings = settings.get('document_search_encodings', ["utf-8"])
-        self.skip_binary = settings.get('document_search_skip_binary_files', True)
-        self.max_file_size = settings.get('document_search_max_file_size_mb', 20)*1000000
-        self.follow_symlinks = settings.get('document_search_follow_sym_links', False)
-        self.max_line_len = settings.get('document_search_max_line_len', 100)
-        self.show_warning_on_open_fail = settings.get('document_search_show_warning_on_open_failure', False)
-        self.show_warning_size_skip = settings.get('document_search_show_warning_on_size_skip', False)
-        self.show_warning_binary_skip = settings.get('document_search_show_warning_on_binary_skip', False)
+        settings = sublime.load_settings('FindInProject.sublime-settings')
+        self.max_line_len = settings.get('find_in_project_max_line_len', 100)
+
+        self.scanner = scanners.FileScanner(settings)
 
     def stop(self):
         """
@@ -46,14 +43,8 @@ class FileSearcherThread(threading.Thread):
             if self._stop_requested():
                 return
 
-            file_size = os.path.getsize(filepath)
-            if file_size > self.max_file_size:
-                result = collections.OrderedDict()
-                if self.show_warning_size_skip:
-                    result[0] = "Skipped file due to size (%.2f MB)." % (file_size/1000000., )
-            else:
-                result = self._search_file(filepath)
-                self._files_searched = self._files_searched + 1
+            result = self._search_file(filepath)
+            self._files_searched = self._files_searched + 1
 
             if len(result):
                 ret = {"filepath": filepath, "result": result, "files_searched": self._files_searched}
@@ -80,35 +71,19 @@ class FileSearcherThread(threading.Thread):
         return flag
 
     def _search_file(self, path):
-        """Search a file for the search terms. Skip binaries if configured."""
+        """Search a file for the search terms."""
 
         ret = collections.OrderedDict()
-        for enc in self.encodings:
-            try:
-                with open(path, "r", encoding=enc) as target_file:
-                    for line_num, line_content in enumerate(target_file, start=1):
-                        # Check for binary file
-                        if self.skip_binary and '\0' in line_content:
-                            ret = collections.OrderedDict()
-                            if self.show_warning_binary_skip:
-                                ret[0] = "Skipped binary file."
-                            return ret
+        for line_num, line_content in self.scanner.read_lines(path):
+            # Search line for target string
+            loc = self._line_matches(line_content, self._search_terms)
+            if loc >= 0:
+                if len(line_content) > self.max_line_len:
+                    line_content = self._limit_line(line_content, loc)
+                ret[line_num] = line_content
 
-                        # Search line for target string
-                        loc = self._line_matches(line_content, self._search_terms)
-                        if loc >= 0:
-                            if len(line_content) > (self.max_line_len):
-                                line_content = self._limit_line(line_content, loc)
-                            ret[line_num] = line_content
-
-            except Exception as e:
-                # Probably using wrong encoding
-                continue
-            else:
-                return ret
-
-        if self.show_warning_on_open_fail:
-            ret[0] = "Failed to open file. This could be due to unknown/unspecified encoding."
+        if self.scanner.warnings:
+            ret[0] = self.scanner.warnings[0]
 
         return ret
 

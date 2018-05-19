@@ -1,21 +1,21 @@
 {
   // Encodings to try (in the order to try them). If we fail to open a file
   // using e.g. UTF-8 we try again with Windows-1252. Defaults to UTF-8 only.
-  "document_search_encodings": ["utf-8", "windows-1252", "windows-1251", "windows-1250"],
+  "find_in_project_encodings": ["utf-8", "windows-1252", "windows-1251", "windows-1250"],
 
   // Skip binary files (files that contains a NULL byte). Note that UTF-16 files
   // might be identified as binary. Defaults to true.
-  "document_search_skip_binary_files": true,
+  "find_in_project_skip_binary_files": true,
 
   // Directories to ignore (case-insensitive). While traversing the project the
   // search does not descend into any directory with the specified name(s).
   // Defaults to none.
-  "document_search_ignore_dirs": [".git", "tmp", "$RECYCLE.BIN"],
+  "find_in_project_ignore_dirs": [".git", "tmp", "$RECYCLE.BIN"],
 
   // File extensions to ignore (case-insensitive). While traversing the project
   // the search skips all files that ends with the specified extensions.
   // Defaults to none.
-  "document_search_ignore_extensions": [
+  "find_in_project_ignore_extensions": [
     // Document extensions
     "pdf", "xls", "xlsx", "doc", "docx", "ppt", "pptx", "epub",
 
@@ -37,34 +37,38 @@
 
   // Maximum file size. While traversing the project the search skips all files
   // that are larger than the specified size. Defaults to 20 MB.
-  "document_search_max_file_size_mb": 20,
+  "find_in_project_max_file_size_mb": 20,
 
   // Follow symbolic links while traversing project. Defaults to false.
-  "document_search_follow_sym_links": false,
+  "find_in_project_follow_sym_links": false,
 
   // Maximum line length in result view excluding the target string. This is
   // nice to have when searching in e.g. minified JS files. Defaults to 100
   // (show a maximum of 50 chars on either sides of the target string).
-  "document_search_max_line_len": 100,
+  "find_in_project_max_line_len": 100,
 
   // Show warning in search results when a file could not be opened. This
   // typically happens when missing an encoding. Defaults to false.
-  "document_search_show_warning_on_open_failure": false,
+  "find_in_project_show_warning_on_open_failure": false,
 
   // Show warning in search results when skipping a file due to size. Defaults
   // to false.
-  "document_search_show_warning_on_size_skip": false,
+  "find_in_project_show_warning_on_size_skip": false,
 
   // Show warning in search results when skipping a binary file. Defaults to
   // false.
-  "document_search_show_warning_on_binary_skip": false,
+  "find_in_project_show_warning_on_binary_skip": false,
 
   // Cancel search when exceeding this amount of hits. Set to 0 to disable.
   // Defaults to 5000.
-  "document_search_excessive_hits_count": 5000,
+  "find_in_project_excessive_hits_count": 5000,
 
   // Regex matching page references
   // Default pattern matches double square brackets around word characters, 
   // eg. [[SamplePageRef]]
-  "document_search_page_ref_pattern": "(?:\\[\\[)(\\w+)(?:\\]\\])"
+  "find_in_project_page_ref_pattern": "(?:\\[\\[)(\\w+)(?:\\]\\])",
+
+  // Regex for separating terms
+  // Default pattern matches all non-word characters such as punctuation
+  "find_in_project_term_separator_pattern": "\\W+"
 }

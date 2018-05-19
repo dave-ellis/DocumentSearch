@@ -1,6 +1,18 @@
 import copy
 
 
+class GraphNode:
+    def __init__(self, node_index, node_id):
+        self.index = node_index
+        self.node_id = node_id
+        self.in_links = set()
+        self.out_counts = 0
+
+    def __repr__(self):
+        return "Node={index=%s, id=%s, in=%s, out=%s}" % \
+               (self.index, self.node_id, repr(self.in_links), self.out_counts)
+
+
 class Graph:
     def __init__(self):
         self._node_map = {}
@@ -57,18 +69,6 @@ class Graph:
             self.add_link(node_id, page_ref)
 
         return node
-
-
-class GraphNode:
-    def __init__(self, node_index, node_id):
-        self.index = node_index
-        self.node_id = node_id
-        self.in_links = set()
-        self.out_counts = 0
-
-    def __repr__(self):
-        return "Node={index=%s, id=%s, in=%s, out=%s}" % \
-               (self.index, self.node_id, repr(self.in_links), self.out_counts)
 
 
 class PageRank:
